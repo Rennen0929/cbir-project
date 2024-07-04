@@ -61,6 +61,24 @@ public class PythonServiceImpl implements PythonService {
         return execCommand(command);
     }
 
+    @Override
+    public List<MatchingResultResponseVo> matchImagesByTexture(String color, String colors) {
+        List<String> command = Lists.newArrayList();
+        command.add("python");
+        command.add(CommonConstant.MATCH_COLOR_SCRIPT_PATH);
+        command.add("texture");
+        List<String> inputs = Lists.newArrayList();
+        inputs.add(color);
+        inputs.add(colors);
+
+        List<String> result = execCommandAndInput(command, inputs);
+        if (CollectionUtil.isEmpty(result) || result.size() != 1) {
+            throw new RuntimeException("[matchImagesByColor]匹配结果不符合预期");
+        }
+        String resultStr = result.get(0);
+        return JsonUtil.parseJSONArray(resultStr, new TypeReference<>() {});
+    }
+
     private List<String> execCommand(List<String> command) {
 
         List<String> result = Lists.newArrayList();

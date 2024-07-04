@@ -8,6 +8,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/cbir-web/cbir-backend/pom.xml" />
+        <option value="$PROJECT_DIR$/cbir-backend/pom.xml" />
       </list>
     </option>
   </component>

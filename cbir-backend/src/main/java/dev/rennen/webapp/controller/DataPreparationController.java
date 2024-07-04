@@ -1,5 +1,6 @@
 package dev.rennen.webapp.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.google.common.collect.Lists;
 import dev.rennen.webapp.common.constants.CommonConstant;
 import dev.rennen.webapp.mapper.ImageAllDataMapper;
@@ -70,6 +71,10 @@ public class DataPreparationController {
                 imageColorModel.setColor(res.get(j));
                 imageColorModels.add(imageColorModel);
             }
+            if (CollectionUtil.isEmpty(imageColorModels)) {
+                log.error("获取颜色信息失败，imageColorModels 为空");
+                return Result.error(500, "获取颜色信息失败，imageColorModels 为空");
+            }
             imageService.batchInsertImageColor(imageColorModels);
         }
         log.info("计算数据库中的所有图片颜色信息完成, 共计算了 {} 张图片", count);
@@ -89,6 +94,10 @@ public class DataPreparationController {
                 imageTextureModel.setImageId(models.get(j).getId());
                 imageTextureModel.setTexture(res.get(j));
                 imageTextureModels.add(imageTextureModel);
+            }
+            if (CollectionUtil.isEmpty(imageTextureModels)) {
+                log.error("获取纹理信息失败，imageTextureModels 为空");
+                return Result.error(500, "获取纹理信息失败，imageTextureModels 为空");
             }
             imageService.batchInsertImageTexture(imageTextureModels);
         }

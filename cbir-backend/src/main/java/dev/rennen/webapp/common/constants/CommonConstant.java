@@ -24,7 +24,12 @@ public class CommonConstant {
     /**
      * 计算单个图片的颜色信息，脚本位置
      */
-    public static final String CALCULATE_TEXTURE_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\calculate_image_color.py";
+    public static final String CALCULATE_COLOR_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\calculate_image_color.py";
+
+    /**
+     * 计算单个图片的颜色信息，脚本位置
+     */
+    public static final String CALCULATE_TEXTURE_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\calculate_image_texture.py";
 
     /**
      * 匹配图片颜色信息，脚本位置
@@ -32,9 +37,14 @@ public class CommonConstant {
     public static final String MATCH_COLOR_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\calculate_image_color.py";
 
     /**
+     * 根据特征向量得出图片相似度，，脚本位置
+     */
+    public static final String MATCH_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\match_image_by_vector.py";
+
+    /**
      * 图片文件存储前缀
      */
-    public static final String IMAGE_FILE_PREFIX = "C:\\cbir-project\\cifar-10-png";
+    public static final String IMAGE_FILE_PREFIX = "C:\\cbir-project\\cifar-10-png\\train";
 
     /**
      * 图片文件上传位置前缀

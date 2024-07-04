@@ -12,4 +12,6 @@ public interface PythonService {
     List<MatchingResultResponseVo> matchImagesByColor (String color, String colors);
 
     List<String> batchCalcTexture(List<String> imagePaths, String imageFilePrefix);
+
+    List<MatchingResultResponseVo> matchImagesByTexture (String color, String colors);
 }
