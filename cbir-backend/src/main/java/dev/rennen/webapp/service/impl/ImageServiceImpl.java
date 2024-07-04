@@ -1,7 +1,6 @@
 package dev.rennen.webapp.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.json.JSON;
 import com.google.common.collect.Lists;
 import dev.rennen.webapp.common.constants.CommonConstant;
 import dev.rennen.webapp.dto.MatchingResultResponseVo;
@@ -13,8 +12,6 @@ import dev.rennen.webapp.model.ImageColorModel;
 import dev.rennen.webapp.model.ImageTextureModel;
 import dev.rennen.webapp.service.ImageService;
 import dev.rennen.webapp.service.PythonService;
-import dev.rennen.webapp.dto.Result;
-import dev.rennen.webapp.utils.BoundedPriorityQueue;
 import dev.rennen.webapp.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.PriorityQueue;
 
 /**
  * @author 夏嘉诚
@@ -66,15 +62,13 @@ public class ImageServiceImpl implements ImageService {
         String pendingMatchColorInfo = colorInfo.get(0);
         // 每次和 50 张照片匹配
         int count = imageColorMapper.countAllImages();
-//        BoundedPriorityQueue<MatchingResultResponseVo> resultQueue = new BoundedPriorityQueue<>(CommonConstant.RETURN_SIZE, Comparator.comparingDouble(MatchingResultResponseVo::getSimilarity));
-//        PriorityQueue<MatchingResultResponseVo> resultQueue = new PriorityQueue<>(Comparator.reverseOrder());
         List<MatchingResultResponseVo> result = Lists.newArrayList();
         for (int i = 0; i < count; i += CommonConstant.BATCH_PROCESS_SIZE) {
             log.info("匹配数据库中的所有图片颜色信息, 当前进度: {}/{}", i, count);
             List<ImageColorModel> colorModels = imageColorMapper.batchSelect(i, CommonConstant.BATCH_PROCESS_SIZE);
             String colorInfoInDatabase = JsonUtil.toJSONString(colorModels);
             log.info("从数据库中获取到图片信息，正在执行 Python 脚本匹配图片颜色信息");
-            List<MatchingResultResponseVo> batchResult = pythonService.matchImagesByColor(pendingMatchColorInfo, colorInfoInDatabase);
+            List<MatchingResultResponseVo> batchResult = pythonService.matchImagesByFeature(pendingMatchColorInfo, colorInfoInDatabase, "color");
             result.addAll(batchResult);
         }
         result.sort(Comparator.reverseOrder());
@@ -84,8 +78,27 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public List<MatchingResultResponseVo> matchImagesByTexture(String fileName, String pathPrefix) {
-        // 1. 获取上传文件的纹理信息
-        return null;
+        // 1. 获取上传图片的颜色信息
+        List<String> textureInfo = pythonService.batchCalcTexture(Lists.asList(fileName, new String[0]), pathPrefix);
+        if (CollectionUtil.isEmpty(textureInfo)) {
+            log.error("获取纹理信息失败");
+            return Lists.newArrayList();
+        }
+        String pendingMatchTextureInfo = textureInfo.get(0);
+        // 每次和 50 张照片匹配
+        int count = imageTextureMapper.countAllImages();
+        List<MatchingResultResponseVo> result = Lists.newArrayList();
+        for (int i = 0; i < count; i += CommonConstant.BATCH_PROCESS_SIZE) {
+            log.info("匹配数据库中的所有图片纹理信息, 当前进度: {}/{}", i, count);
+            List<ImageTextureModel> textureModels = imageTextureMapper.batchSelect(i, CommonConstant.BATCH_PROCESS_SIZE);
+            String colorInfoInDatabase = JsonUtil.toJSONString(textureModels);
+            log.info("从数据库中获取到图片信息，正在执行 Python 脚本匹配图片纹理信息");
+            List<MatchingResultResponseVo> batchResult = pythonService.matchImagesByFeature(pendingMatchTextureInfo, colorInfoInDatabase, "texture");
+            result.addAll(batchResult);
+        }
+        result.sort(Comparator.reverseOrder());
+        log.info("匹配数据库中的所有图片纹理信息完成, 共计算了 {} 张图片", count);
+        return fillPath(result.subList(0, Math.min(result.size(), CommonConstant.RETURN_SIZE)));
     }
 
     @Override

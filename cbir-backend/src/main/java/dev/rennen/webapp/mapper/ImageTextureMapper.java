@@ -28,4 +28,8 @@ public interface ImageTextureMapper {
     int updateByPrimaryKey(ImageTextureModel record);
 
     int batchInsert(List<ImageTextureModel> imageTextureModels);
+
+    int countAllImages();
+
+    List<ImageTextureModel> batchSelect(int offset, int limit);
 }

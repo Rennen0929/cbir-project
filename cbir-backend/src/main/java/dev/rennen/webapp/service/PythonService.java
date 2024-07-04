@@ -9,9 +9,8 @@ public interface PythonService {
 
     List<String> batchCalcColor(List<String> imagePaths, String pathPrefix);
 
-    List<MatchingResultResponseVo> matchImagesByColor (String color, String colors);
+    List<MatchingResultResponseVo> matchImagesByFeature(String vector, String datas, String dimension);
 
     List<String> batchCalcTexture(List<String> imagePaths, String imageFilePrefix);
 
-    List<MatchingResultResponseVo> matchImagesByTexture (String color, String colors);
 }
