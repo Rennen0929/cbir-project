@@ -45,6 +45,18 @@
                 <if test="texture != null">#{texture,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
+
+    <insert id="batchInsert">
+        insert into image_texture
+        (image_id,texture
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.imageId,jdbcType=BIGINT},#{item.texture,jdbcType=VARCHAR})
+        </foreach>
+        on duplicate key update image_id = values(image_id), texture = values(texture)
+    </insert>
+
     <update id="updateByPrimaryKeySelective" parameterType="dev.rennen.webapp.model.ImageTextureModel">
         update image_texture
         <set>

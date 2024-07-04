@@ -7,8 +7,10 @@ import dev.rennen.webapp.common.constants.CommonConstant;
 import dev.rennen.webapp.dto.MatchingResultResponseVo;
 import dev.rennen.webapp.mapper.ImageAllDataMapper;
 import dev.rennen.webapp.mapper.ImageColorMapper;
+import dev.rennen.webapp.mapper.ImageTextureMapper;
 import dev.rennen.webapp.model.ImageAllDataModel;
 import dev.rennen.webapp.model.ImageColorModel;
+import dev.rennen.webapp.model.ImageTextureModel;
 import dev.rennen.webapp.service.ImageService;
 import dev.rennen.webapp.service.PythonService;
 import dev.rennen.webapp.dto.Result;
@@ -16,6 +18,7 @@ import dev.rennen.webapp.utils.BoundedPriorityQueue;
 import dev.rennen.webapp.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -38,6 +41,8 @@ public class ImageServiceImpl implements ImageService {
 
     @Resource
     PythonService pythonService;
+    @Autowired
+    private ImageTextureMapper imageTextureMapper;
 
 
     @Override
@@ -80,7 +85,12 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public List<MatchingResultResponseVo> matchImagesByTexture(String fileName, String pathPrefix) {
         // 1. 获取上传文件的纹理信息
+        return null;
+    }
 
+    @Override
+    public int batchInsertImageTexture(List<ImageTextureModel> imageTextureModels) {
+        return imageTextureMapper.batchInsert(imageTextureModels);
     }
 
     private List<MatchingResultResponseVo> fillPath (List<MatchingResultResponseVo> list) {

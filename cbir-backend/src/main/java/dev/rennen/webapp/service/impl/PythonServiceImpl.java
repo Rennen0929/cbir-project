@@ -49,6 +49,18 @@ public class PythonServiceImpl implements PythonService {
         return JsonUtil.parseJSONArray(resultStr, new TypeReference<>() {});
     }
 
+    @Override
+    public List<String> batchCalcTexture(List<String> imagePaths, String imageFilePrefix) {
+        List<String> command = Lists.newArrayList();
+        command.add("python");
+        command.add(CommonConstant.CALCULATE_TEXTURE_SCRIPT_PATH);
+        command.add(imageFilePrefix);
+        List<String> handledPaths = imagePaths.stream().map(PathUtil::pathConverter).toList();
+        command.addAll(handledPaths);
+
+        return execCommand(command);
+    }
+
     private List<String> execCommand(List<String> command) {
 
         List<String> result = Lists.newArrayList();

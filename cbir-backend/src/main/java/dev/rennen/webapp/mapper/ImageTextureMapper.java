@@ -4,6 +4,8 @@ package dev.rennen.webapp.mapper;
 import dev.rennen.webapp.model.ImageTextureModel;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
 * @author 澶忓槈璇�
 * @description 针对表【image_texture】的数据库操作Mapper
@@ -25,4 +27,5 @@ public interface ImageTextureMapper {
 
     int updateByPrimaryKey(ImageTextureModel record);
 
+    int batchInsert(List<ImageTextureModel> imageTextureModels);
 }

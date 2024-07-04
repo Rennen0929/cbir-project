@@ -3,6 +3,7 @@ package dev.rennen.webapp.service;
 import dev.rennen.webapp.dto.MatchingResultResponseVo;
 import dev.rennen.webapp.model.ImageAllDataModel;
 import dev.rennen.webapp.model.ImageColorModel;
+import dev.rennen.webapp.model.ImageTextureModel;
 
 import java.util.List;
 
@@ -31,4 +32,6 @@ public interface ImageService {
      * @return 匹配结果
      */
     List<MatchingResultResponseVo> matchImagesByTexture(String fileName, String pathPrefix);
+
+    int batchInsertImageTexture(List<ImageTextureModel> imageTextureModels);
 }

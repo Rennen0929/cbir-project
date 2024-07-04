@@ -24,7 +24,7 @@ public class CommonConstant {
     /**
      * 计算单个图片的颜色信息，脚本位置
      */
-    public static final String CALCULATE_COLOR_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\calculate_image_color.py";
+    public static final String CALCULATE_TEXTURE_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\calculate_image_color.py";
 
     /**
      * 匹配图片颜色信息，脚本位置
