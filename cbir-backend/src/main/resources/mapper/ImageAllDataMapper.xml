@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.rennen.webapp.mapper.ImageAllDataMapper">
+
+    <resultMap id="BaseResultMap" type="dev.rennen.webapp.model.ImageAllDataModel">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="path" column="path" jdbcType="VARCHAR"/>
+            <result property="category" column="category" jdbcType="VARCHAR"/>
+            <result property="seqNum" column="seq_num" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,path,category,
+        seq_num
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from image_all_data
+        where  id = #{id,jdbcType=BIGINT} 
+    </select>
+
+    <select id="countAllImages" resultType="java.lang.Integer">
+        select count(*) from image_all_data
+    </select>
+    <select id="selectBatch" resultType="dev.rennen.webapp.model.ImageAllDataModel">
+        select
+        <include refid="Base_Column_List" />
+        from image_all_data
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from image_all_data
+        where  id = #{id,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="dev.rennen.webapp.model.ImageAllDataModel" useGeneratedKeys="true">
+        insert into image_all_data
+        ( id,path,category
+        ,seq_num)
+        values (#{id,jdbcType=BIGINT},#{path,jdbcType=VARCHAR},#{category,jdbcType=VARCHAR}
+        ,#{seqNum,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="dev.rennen.webapp.model.ImageAllDataModel" useGeneratedKeys="true">
+        insert into image_all_data
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="path != null">path,</if>
+                <if test="category != null">category,</if>
+                <if test="seqNum != null">seq_num,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id,jdbcType=BIGINT},</if>
+                <if test="path != null">#{path,jdbcType=VARCHAR},</if>
+                <if test="category != null">#{category,jdbcType=VARCHAR},</if>
+                <if test="seqNum != null">#{seqNum,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+    <insert id="insertBatch">
+        insert into image_all_data
+        (path,category
+        ,seq_num)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.path,jdbcType=VARCHAR},#{item.category,jdbcType=VARCHAR}
+            ,#{item.seqNum,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="dev.rennen.webapp.model.ImageAllDataModel">
+        update image_all_data
+        <set>
+                <if test="path != null">
+                    path = #{path,jdbcType=VARCHAR},
+                </if>
+                <if test="category != null">
+                    category = #{category,jdbcType=VARCHAR},
+                </if>
+                <if test="seqNum != null">
+                    seq_num = #{seqNum,jdbcType=INTEGER},
+                </if>
+        </set>
+        where   id = #{id,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="dev.rennen.webapp.model.ImageAllDataModel">
+        update image_all_data
+        set 
+            path =  #{path,jdbcType=VARCHAR},
+            category =  #{category,jdbcType=VARCHAR},
+            seq_num =  #{seqNum,jdbcType=INTEGER}
+        where   id = #{id,jdbcType=BIGINT} 
+    </update>
+</mapper>

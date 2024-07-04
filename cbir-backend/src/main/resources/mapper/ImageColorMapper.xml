@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.rennen.webapp.mapper.ImageColorMapper">
+
+    <resultMap id="BaseResultMap" type="dev.rennen.webapp.model.ImageColorModel">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="imageId" column="image_id" jdbcType="BIGINT"/>
+            <result property="color" column="color" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,image_id,color
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from image_color
+        where  id = #{id,jdbcType=BIGINT} 
+    </select>
+    <select id="countAllImages" resultType="java.lang.Integer">
+        select count(*) from image_color
+    </select>
+    <select id="batchSelect" resultType="dev.rennen.webapp.model.ImageColorModel">
+        select
+        <include refid="Base_Column_List" />
+        from image_color
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from image_color
+        where  id = #{id,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="dev.rennen.webapp.model.ImageColorModel" useGeneratedKeys="true">
+        insert into image_color
+        ( id,image_id,color
+        )
+        values (#{id,jdbcType=BIGINT},#{imageId,jdbcType=BIGINT},#{color,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="dev.rennen.webapp.model.ImageColorModel" useGeneratedKeys="true">
+        insert into image_color
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="imageId != null">image_id,</if>
+                <if test="color != null">color,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id,jdbcType=BIGINT},</if>
+                <if test="imageId != null">#{imageId,jdbcType=BIGINT},</if>
+                <if test="color != null">#{color,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <insert id="insertBatch">
+        insert into image_color
+        ( image_id,color
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.imageId,jdbcType=BIGINT},#{item.color,jdbcType=VARCHAR})
+        </foreach>
+        on duplicate key update image_id = values(image_id), color = values(color)
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="dev.rennen.webapp.model.ImageColorModel">
+        update image_color
+        <set>
+                <if test="imageId != null">
+                    image_id = #{imageId,jdbcType=BIGINT},
+                </if>
+                <if test="color != null">
+                    color = #{color,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   id = #{id,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="dev.rennen.webapp.model.ImageColorModel">
+        update image_color
+        set 
+            image_id =  #{imageId,jdbcType=BIGINT},
+            color =  #{color,jdbcType=VARCHAR}
+        where   id = #{id,jdbcType=BIGINT} 
+    </update>
+</mapper>

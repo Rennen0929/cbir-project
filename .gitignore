@@ -1,0 +1,4 @@
+/uploaded-images/*
+/cifar-10-png/test
+/cifar-10-png/train
+/cbir-backend/target/

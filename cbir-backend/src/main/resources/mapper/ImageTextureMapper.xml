@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.rennen.webapp.mapper.ImageTextureMapper">
+
+    <resultMap id="BaseResultMap" type="dev.rennen.webapp.model.ImageTextureModel">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="imageId" column="image_id" jdbcType="BIGINT"/>
+            <result property="texture" column="texture" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,image_id,texture
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from image_texture
+        where  id = #{id,jdbcType=BIGINT} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from image_texture
+        where  id = #{id,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="dev.rennen.webapp.model.ImageTextureModel" useGeneratedKeys="true">
+        insert into image_texture
+        ( id,image_id,texture
+        )
+        values (#{id,jdbcType=BIGINT},#{imageId,jdbcType=BIGINT},#{texture,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="dev.rennen.webapp.model.ImageTextureModel" useGeneratedKeys="true">
+        insert into image_texture
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="imageId != null">image_id,</if>
+                <if test="texture != null">texture,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id,jdbcType=BIGINT},</if>
+                <if test="imageId != null">#{imageId,jdbcType=BIGINT},</if>
+                <if test="texture != null">#{texture,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="dev.rennen.webapp.model.ImageTextureModel">
+        update image_texture
+        <set>
+                <if test="imageId != null">
+                    image_id = #{imageId,jdbcType=BIGINT},
+                </if>
+                <if test="texture != null">
+                    texture = #{texture,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   id = #{id,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="dev.rennen.webapp.model.ImageTextureModel">
+        update image_texture
+        set 
+            image_id =  #{imageId,jdbcType=BIGINT},
+            texture =  #{texture,jdbcType=VARCHAR}
+        where   id = #{id,jdbcType=BIGINT} 
+    </update>
+</mapper>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Color Calculation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .results {
+      margin-top: 20px;
+    }
+    .result-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .result-item img {
+      width: 100px;
+      height: 100px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+<h1>Image Color Calculation</h1>
+<form id="uploadForm">
+  <input type="file" id="fileInput" name="file" accept="image/*" required>
+  <button type="submit">Upload and Calculate</button>
+</form>
+<div class="results" id="results"></div>
+
+<script>
+  document.getElementById('uploadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      fetch('http://localhost:8080/api/calculateColor', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.code === 200) {
+            displayResults(data.data);
+          } else {
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('There was an error processing your request.');
+        });
+    }
+  });
+
+  function displayResults(results) {
+    const resultsContainer = document.getElementById('results');
+    resultsContainer.innerHTML = '';
+    results.forEach(result => {
+      const resultItem = document.createElement('div');
+      resultItem.className = 'result-item';
+
+      const img = document.createElement('img');
+      img.src = result.path;
+      img.alt = `Image ID: ${result.imageId}`;
+
+      const info = document.createElement('div');
+      info.innerHTML = `<strong>Image ID:</strong> ${result.imageId}<br><strong>Similarity:</strong> ${result.similarity}`;
+
+      resultItem.appendChild(img);
+      resultItem.appendChild(info);
+      resultsContainer.appendChild(resultItem);
+    });
+  }
+</script>
+</body>
+</html>
