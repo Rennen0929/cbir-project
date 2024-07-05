@@ -41,4 +41,6 @@ public interface ImageService {
     List<MatchingResultResponseVo> matchImagesByShape(String fileName, String pathPrefix);
 
     List<MatchingResultResponseVo> matchImagesByMix(String fileName, String pathPrefix);
+
+    List<MatchingResultResponseVo> fillPath(List<MatchingResultResponseVo> result);
 }

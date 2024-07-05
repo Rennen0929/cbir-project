@@ -2,6 +2,7 @@ package dev.rennen.webapp.controller;
 
 import dev.rennen.webapp.common.constants.CommonConstant;
 import dev.rennen.webapp.dto.MatchingResultResponseVo;
+import dev.rennen.webapp.mapper.ImageAllDataMapper;
 import dev.rennen.webapp.service.FileService;
 import dev.rennen.webapp.service.ImageService;
 import dev.rennen.webapp.dto.Result;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author 夏嘉诚
@@ -30,6 +33,7 @@ public class MainController {
     @Resource
     ImageService imageService;
 
+
     /**
      * 根据颜色匹配
      * @param file 上传的图片
@@ -42,7 +46,10 @@ public class MainController {
         if (filename == null) {
             return Result.error(500, "上传文件失败");
         }
-        return Result.success(imageService.matchImagesByColor("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX));
+        List<MatchingResultResponseVo> result = imageService.matchImagesByColor("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX);
+
+        result.sort(Comparator.reverseOrder());
+        return Result.success(imageService.fillPath(result.subList(0, Math.min(result.size(), CommonConstant.RETURN_SIZE))));
     }
 
     /**
@@ -55,7 +62,10 @@ public class MainController {
         if (filename == null) {
             return Result.error(500, "上传文件失败");
         }
-        return Result.success(imageService.matchImagesByTexture("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX));
+        List<MatchingResultResponseVo> result = imageService.matchImagesByTexture("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX);
+
+        result.sort(Comparator.reverseOrder());
+        return Result.success(imageService.fillPath(result.subList(0, Math.min(result.size(), CommonConstant.RETURN_SIZE))));
     }
 
     @PostMapping("/calculateShape")
@@ -65,7 +75,10 @@ public class MainController {
         if (filename == null) {
             return Result.error(500, "上传文件失败");
         }
-        return Result.success(imageService.matchImagesByShape("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX));
+        List<MatchingResultResponseVo> result = imageService.matchImagesByShape("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX);
+
+        result.sort(Comparator.reverseOrder());
+        return Result.success(imageService.fillPath(result.subList(0, Math.min(result.size(), CommonConstant.RETURN_SIZE))));
     }
 
     @PostMapping("/calculateMix")
@@ -77,6 +90,7 @@ public class MainController {
         }
         return Result.success(imageService.matchImagesByMix("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX));
     }
+
 
 
 }

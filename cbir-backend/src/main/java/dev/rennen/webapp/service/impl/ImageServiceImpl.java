@@ -22,7 +22,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author 夏嘉诚
@@ -45,6 +49,9 @@ public class ImageServiceImpl implements ImageService {
 
     @Resource
     ImageShapeMapper imageShapeMapper;
+
+    @Resource
+    ExecutorService taskExecutor;
 
 
     @Override
@@ -76,9 +83,8 @@ public class ImageServiceImpl implements ImageService {
             List<MatchingResultResponseVo> batchResult = pythonService.matchImagesByFeature(pendingMatchColorInfo, colorInfoInDatabase, "color");
             result.addAll(batchResult);
         }
-        result.sort(Comparator.reverseOrder());
         log.info("匹配数据库中的所有图片颜色信息完成, 共计算了 {} 张图片", count);
-        return fillPath(result.subList(0, Math.min(result.size(), CommonConstant.RETURN_SIZE)));
+        return result;
     }
 
     @Override
@@ -100,9 +106,8 @@ public class ImageServiceImpl implements ImageService {
             List<MatchingResultResponseVo> batchResult = pythonService.matchImagesByFeature(pendingMatchTextureInfo, colorInfoInDatabase, "texture");
             result.addAll(batchResult);
         }
-        result.sort(Comparator.reverseOrder());
         log.info("匹配数据库中的所有图片纹理信息完成, 共计算了 {} 张图片", count);
-        return fillPath(result.subList(0, Math.min(result.size(), CommonConstant.RETURN_SIZE)));
+        return result;
     }
 
     @Override
@@ -134,21 +139,65 @@ public class ImageServiceImpl implements ImageService {
             List<MatchingResultResponseVo> batchResult = pythonService.matchImagesByFeature(pendingMatchShapeInfo, shapeInfoInDatabase, "shape");
             result.addAll(batchResult);
         }
-        result.sort(Comparator.reverseOrder());
         log.info("匹配数据库中的所有图片形状信息完成, 共计算了 {} 张图片", count);
-        return fillPath(result.subList(0, Math.min(result.size(), CommonConstant.RETURN_SIZE)));
+        return result;
     }
 
     @Override
     public List<MatchingResultResponseVo> matchImagesByMix(String fileName, String pathPrefix) {
 
+
+        // 创建Callable任务
+        Callable<List<MatchingResultResponseVo>> shapeTask = () -> matchImagesByShape(fileName, pathPrefix);
+        Callable<List<MatchingResultResponseVo>> colorTask = () -> matchImagesByColor(fileName, pathPrefix);
+        Callable<List<MatchingResultResponseVo>> textureTask = () -> matchImagesByTexture(fileName, pathPrefix);
+
+        // 获取结果
+        List<MatchingResultResponseVo> shapeList = Lists.newArrayList();
+        List<MatchingResultResponseVo> colorList = Lists.newArrayList();
+        List<MatchingResultResponseVo> textureList = Lists.newArrayList();
+
+        try {
+            // 提交任务并获取Future对象
+            Future<List<MatchingResultResponseVo>> shapeFuture = taskExecutor.submit(shapeTask);
+            Future<List<MatchingResultResponseVo>> colorFuture = taskExecutor.submit(colorTask);
+            Future<List<MatchingResultResponseVo>> textureFuture = taskExecutor.submit(textureTask);
+
+            // 获取结果
+            shapeList = shapeFuture.get();
+            colorList = colorFuture.get();
+            textureList = textureFuture.get();
+
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Error occurred while executing tasks: {}", e.getMessage());
+        }
+
+        Map<Long, MatchingResultResponseVo> shapeMap = shapeList.stream().collect(Collectors.toMap(MatchingResultResponseVo::getImageId, Function.identity()));
+        Map<Long, MatchingResultResponseVo> colorMap = colorList.stream().collect(Collectors.toMap(MatchingResultResponseVo::getImageId, Function.identity()));
+        Map<Long, MatchingResultResponseVo> textureMap = textureList.stream().collect(Collectors.toMap(MatchingResultResponseVo::getImageId, Function.identity()));
+
+        List<MatchingResultResponseVo> result = Lists.newArrayList();
+        for (Long key : shapeMap.keySet()) {
+            if (colorMap.containsKey(key) && textureMap.containsKey(key)) {
+                MatchingResultResponseVo vo = new MatchingResultResponseVo();
+                vo.setImageId(key);
+                vo.setPath(shapeMap.get(key).getPath());
+                vo.setSimilarity(shapeMap.get(key).getSimilarity() * 0.2 + colorMap.get(key).getSimilarity() * 0.2 + textureMap.get(key).getSimilarity() * 0.6);
+                result.add(vo);
+            }
+        }
+        result.sort(Comparator.reverseOrder());
+        return fillPath(result.subList(0, Math.min(result.size(), CommonConstant.RETURN_SIZE)));
+
     }
 
-    private List<MatchingResultResponseVo> fillPath (List<MatchingResultResponseVo> list) {
+    @Override
+    public List<MatchingResultResponseVo> fillPath (List<MatchingResultResponseVo> list) {
         for (MatchingResultResponseVo vo : list) {
             Optional.of(imageAllDataMapper.selectByPrimaryKey(vo.getImageId()))
                     .ifPresent(imageAllDataModel -> vo.setPath(CommonConstant.IMAGE_HOST_URL_PREFIX + imageAllDataModel.getPath()));
         }
         return list;
     }
+
 }
