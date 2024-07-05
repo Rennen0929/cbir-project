@@ -6,6 +6,7 @@ import dev.rennen.webapp.common.constants.CommonConstant;
 import dev.rennen.webapp.mapper.ImageAllDataMapper;
 import dev.rennen.webapp.model.ImageAllDataModel;
 import dev.rennen.webapp.model.ImageColorModel;
+import dev.rennen.webapp.model.ImageShapeModel;
 import dev.rennen.webapp.model.ImageTextureModel;
 import dev.rennen.webapp.service.ImageService;
 import dev.rennen.webapp.service.PythonService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -102,6 +104,30 @@ public class DataPreparationController {
             imageService.batchInsertImageTexture(imageTextureModels);
         }
         log.info("计算数据库中的所有图片纹理信息完成, 共计算了 {} 张图片", count);
+        return Result.success("success");
+    }
+
+    @GetMapping("/calculateShape")
+    public Result<String> calculateShape() {
+        int count = imageAllDataMapper.countAllImages();
+        for (int i = 0; i < count; i += CommonConstant.BATCH_PROCESS_SIZE) {
+            List<ImageAllDataModel> models = imageService.batchSelect(i, CommonConstant.BATCH_PROCESS_SIZE);
+            List<String> imagePaths = models.stream().map(ImageAllDataModel::getPath).toList();
+            List<String> res = pythonService.batchCalcShape(imagePaths, CommonConstant.IMAGE_FILE_PREFIX);
+            List<ImageShapeModel> imageShapeModels = Lists.newArrayList();
+            for (int j = 0; j < res.size(); j++) {
+                ImageShapeModel imageShapeModel = new ImageShapeModel();
+                imageShapeModel.setImageId(models.get(j).getId());
+                imageShapeModel.setShape(res.get(j));
+                imageShapeModels.add(imageShapeModel);
+            }
+            if (CollectionUtil.isEmpty(imageShapeModels)) {
+                log.error("获取形状信息失败，imageShapeModels 为空");
+                return Result.error(500, "获取形状信息失败，imageShapeModels 为空");
+            }
+            imageService.batchInsertImageShape(imageShapeModels);
+        }
+        log.info("计算数据库中的所有图片形状信息完成, 共计算了 {} 张图片", count);
         return Result.success("success");
     }
 }

@@ -6,9 +6,11 @@ import dev.rennen.webapp.common.constants.CommonConstant;
 import dev.rennen.webapp.dto.MatchingResultResponseVo;
 import dev.rennen.webapp.mapper.ImageAllDataMapper;
 import dev.rennen.webapp.mapper.ImageColorMapper;
+import dev.rennen.webapp.mapper.ImageShapeMapper;
 import dev.rennen.webapp.mapper.ImageTextureMapper;
 import dev.rennen.webapp.model.ImageAllDataModel;
 import dev.rennen.webapp.model.ImageColorModel;
+import dev.rennen.webapp.model.ImageShapeModel;
 import dev.rennen.webapp.model.ImageTextureModel;
 import dev.rennen.webapp.service.ImageService;
 import dev.rennen.webapp.service.PythonService;
@@ -37,8 +39,12 @@ public class ImageServiceImpl implements ImageService {
 
     @Resource
     PythonService pythonService;
-    @Autowired
-    private ImageTextureMapper imageTextureMapper;
+
+    @Resource
+    ImageTextureMapper imageTextureMapper;
+
+    @Resource
+    ImageShapeMapper imageShapeMapper;
 
 
     @Override
@@ -60,7 +66,6 @@ public class ImageServiceImpl implements ImageService {
             return Lists.newArrayList();
         }
         String pendingMatchColorInfo = colorInfo.get(0);
-        // 每次和 50 张照片匹配
         int count = imageColorMapper.countAllImages();
         List<MatchingResultResponseVo> result = Lists.newArrayList();
         for (int i = 0; i < count; i += CommonConstant.BATCH_PROCESS_SIZE) {
@@ -85,7 +90,6 @@ public class ImageServiceImpl implements ImageService {
             return Lists.newArrayList();
         }
         String pendingMatchTextureInfo = textureInfo.get(0);
-        // 每次和 50 张照片匹配
         int count = imageTextureMapper.countAllImages();
         List<MatchingResultResponseVo> result = Lists.newArrayList();
         for (int i = 0; i < count; i += CommonConstant.BATCH_PROCESS_SIZE) {
@@ -104,6 +108,40 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public int batchInsertImageTexture(List<ImageTextureModel> imageTextureModels) {
         return imageTextureMapper.batchInsert(imageTextureModels);
+    }
+
+    @Override
+    public int batchInsertImageShape(List<ImageShapeModel> imageShapeModels) {
+        return imageShapeMapper.batchInsert(imageShapeModels);
+    }
+
+    @Override
+    public List<MatchingResultResponseVo> matchImagesByShape(String fileName, String pathPrefix) {
+        // 1. 获取上传图片的形状信息
+        List<String> shapeInfo = pythonService.batchCalcShape(Lists.asList(fileName, new String[0]), pathPrefix);
+        if (CollectionUtil.isEmpty(shapeInfo)) {
+            log.error("获取形状信息失败");
+            return Lists.newArrayList();
+        }
+        String pendingMatchShapeInfo = shapeInfo.get(0);
+        int count = imageShapeMapper.countAllImages();
+        List<MatchingResultResponseVo> result = Lists.newArrayList();
+        for (int i = 0; i < count; i += CommonConstant.BATCH_PROCESS_SIZE) {
+            log.info("匹配数据库中的所有图片形状信息, 当前进度: {}/{}", i, count);
+            List<ImageShapeModel> shapeModels = imageShapeMapper.batchSelect(i, CommonConstant.BATCH_PROCESS_SIZE);
+            String shapeInfoInDatabase = JsonUtil.toJSONString(shapeModels);
+            log.info("从数据库中获取到图片信息，正在执行 Python 脚本匹配图片形状信息");
+            List<MatchingResultResponseVo> batchResult = pythonService.matchImagesByFeature(pendingMatchShapeInfo, shapeInfoInDatabase, "shape");
+            result.addAll(batchResult);
+        }
+        result.sort(Comparator.reverseOrder());
+        log.info("匹配数据库中的所有图片形状信息完成, 共计算了 {} 张图片", count);
+        return fillPath(result.subList(0, Math.min(result.size(), CommonConstant.RETURN_SIZE)));
+    }
+
+    @Override
+    public List<MatchingResultResponseVo> matchImagesByMix(String fileName, String pathPrefix) {
+
     }
 
     private List<MatchingResultResponseVo> fillPath (List<MatchingResultResponseVo> list) {

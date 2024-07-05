@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Feature Calculation</title>
+    <title>基于视觉特征的图像检索web系统（CBIR）</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,31 +25,31 @@
     </style>
 </head>
 <body>
-<h1>Image Feature Calculation</h1>
+<h1>基于视觉特征的图像检索web系统（CBIR）</h1>
 <form id="uploadForm">
     <input type="file" id="fileInput" name="file" accept="image/*" required>
-    <button type="button" id="colorButton">Calculate Color</button>
-    <button type="button" id="textureButton">Calculate Texture</button>
-    <button type="button" id="shapeButton">Calculate Shape</button>
-    <button type="button" id="mixButton">Calculate Mix</button>
+    <button type="button" id="colorButton">根据颜色匹配</button>
+    <button type="button" id="textureButton">根据纹理匹配</button>
+    <button type="button" id="shapeButton">根据形状匹配</button>
+    <button type="button" id="mixButton">混合匹配</button>
 </form>
 <div class="results" id="results"></div>
 
 <script>
     document.getElementById('colorButton').addEventListener('click', function() {
-        handleButtonClick('http://localhost:8080/api/calculateColor', 'Color');
+        handleButtonClick('http://localhost:8080/api/calculateColor', '颜色');
     });
 
     document.getElementById('textureButton').addEventListener('click', function() {
-        handleButtonClick('http://localhost:8080/api/calculateTexture', 'Texture');
+        handleButtonClick('http://localhost:8080/api/calculateTexture', '纹理');
     });
 
     document.getElementById('shapeButton').addEventListener('click', function() {
-        handleButtonClick('http://localhost:8080/api/calculateShape', 'Shape');
+        handleButtonClick('http://localhost:8080/api/calculateShape', '形状');
     });
 
     document.getElementById('mixButton').addEventListener('click', function() {
-        handleButtonClick('http://localhost:8080/api/calculateMix', 'Mix');
+        handleButtonClick('http://localhost:8080/api/calculateMix', '混合特征');
     });
 
     function handleButtonClick(url, feature) {
@@ -80,7 +80,7 @@
 
     function displayResults(results, feature) {
         const resultsContainer = document.getElementById('results');
-        resultsContainer.innerHTML = `<h2>Top 12 Matches by ${feature}</h2>`;
+        resultsContainer.innerHTML = `<h2>根据 ${feature} 最匹配的 12 个结果</h2>`;
         results.forEach(result => {
             const resultItem = document.createElement('div');
             resultItem.className = 'result-item';

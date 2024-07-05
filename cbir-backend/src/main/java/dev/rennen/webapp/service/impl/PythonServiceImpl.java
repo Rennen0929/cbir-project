@@ -62,6 +62,17 @@ public class PythonServiceImpl implements PythonService {
         return execCommand(command);
     }
 
+    @Override
+    public List<String> batchCalcShape(List<String> imagePaths, String imageFilePrefix) {
+        List<String> command = Lists.newArrayList();
+        command.add("python");
+        command.add(CommonConstant.CALCULATE_SHAPE_SCRIPT_PATH);
+        command.add(imageFilePrefix);
+        List<String> handledPaths = imagePaths.stream().map(PathUtil::pathConverter).toList();
+        command.addAll(handledPaths);
+
+        return execCommand(command);
+    }
 
 
     private List<String> execCommand(List<String> command) {

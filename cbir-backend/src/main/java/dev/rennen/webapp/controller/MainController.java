@@ -58,5 +58,25 @@ public class MainController {
         return Result.success(imageService.matchImagesByTexture("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX));
     }
 
+    @PostMapping("/calculateShape")
+    public Result<List<MatchingResultResponseVo>> calculateShape(MultipartFile file) {
+        // 1. 先将从接口上传的文件保存到本地
+        String filename = fileService.uploadFile(file, CommonConstant.IMAGE_UPLOAD_PREFIX);
+        if (filename == null) {
+            return Result.error(500, "上传文件失败");
+        }
+        return Result.success(imageService.matchImagesByShape("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX));
+    }
+
+    @PostMapping("/calculateMix")
+    public Result<List<MatchingResultResponseVo>> calculateMix(MultipartFile file) {
+        // 1. 先将从接口上传的文件保存到本地
+        String filename = fileService.uploadFile(file, CommonConstant.IMAGE_UPLOAD_PREFIX);
+        if (filename == null) {
+            return Result.error(500, "上传文件失败");
+        }
+        return Result.success(imageService.matchImagesByMix("\\" + filename, CommonConstant.IMAGE_UPLOAD_PREFIX));
+    }
+
 
 }

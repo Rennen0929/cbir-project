@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.rennen.webapp.mapper.ImageShapeMapper">
+
+    <resultMap id="BaseResultMap" type="dev.rennen.webapp.model.ImageShapeModel">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="imageId" column="image_id" jdbcType="BIGINT"/>
+            <result property="shape" column="shape" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,image_id,shape
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from image_shape
+        where  id = #{id,jdbcType=BIGINT} 
+    </select>
+    <select id="countAllImages" resultType="java.lang.Integer">
+        select count(*) from image_shape
+    </select>
+    <select id="batchSelect" resultType="dev.rennen.webapp.model.ImageShapeModel">
+        select
+        <include refid="Base_Column_List" />
+        from image_shape
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from image_shape
+        where  id = #{id,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="dev.rennen.webapp.model.ImageShapeModel" useGeneratedKeys="true">
+        insert into image_shape
+        ( id,image_id,shape
+        )
+        values (#{id,jdbcType=BIGINT},#{imageId,jdbcType=BIGINT},#{shape,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="dev.rennen.webapp.model.ImageShapeModel" useGeneratedKeys="true">
+        insert into image_shape
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="imageId != null">image_id,</if>
+                <if test="shape != null">shape,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id,jdbcType=BIGINT},</if>
+                <if test="imageId != null">#{imageId,jdbcType=BIGINT},</if>
+                <if test="shape != null">#{shape,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <insert id="batchInsert">
+        insert into image_shape
+        ( image_id,shape
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.imageId,jdbcType=BIGINT},#{item.shape,jdbcType=VARCHAR})
+        </foreach>
+        on duplicate key update image_id = values(image_id), shape = values(shape)
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="dev.rennen.webapp.model.ImageShapeModel">
+        update image_shape
+        <set>
+                <if test="imageId != null">
+                    image_id = #{imageId,jdbcType=BIGINT},
+                </if>
+                <if test="shape != null">
+                    shape = #{shape,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   id = #{id,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="dev.rennen.webapp.model.ImageShapeModel">
+        update image_shape
+        set 
+            image_id =  #{imageId,jdbcType=BIGINT},
+            shape =  #{shape,jdbcType=VARCHAR}
+        where   id = #{id,jdbcType=BIGINT} 
+    </update>
+</mapper>

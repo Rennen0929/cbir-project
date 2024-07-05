@@ -13,4 +13,5 @@ public interface PythonService {
 
     List<String> batchCalcTexture(List<String> imagePaths, String imageFilePrefix);
 
+    List<String> batchCalcShape(List<String> imagePaths, String imageFilePrefix);
 }
