@@ -4,9 +4,9 @@ import sys
 
 def extract_color_histogram(image, bins=(8, 8, 8)):
     # 提取图像的颜色直方图
-    hist = cv2.calcHist([image], [0, 1, 2], None, bins, [0, 256, 0, 256, 0, 256])
-    cv2.normalize(hist, hist)
-    return hist.flatten()
+    hist = cv2.calcHist([image], [0, 1, 2], None, bins, [0, 256, 0, 256, 0, 256])  # 计算直方图
+    cv2.normalize(hist, hist)  # 归一化直方图
+    return hist.flatten()  # 返回一维的颜色直方图
 
 
 def load_image_and_extract_histograms(image_path):

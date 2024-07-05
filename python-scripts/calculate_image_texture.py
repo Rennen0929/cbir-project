@@ -21,12 +21,12 @@ def extract_features(image_path):
                         symmetric=True, normed=True)
 
     # 计算纹理特征
-    contrast = graycoprops(glcm, 'contrast').flatten()
-    dissimilarity = graycoprops(glcm, 'dissimilarity').flatten()
-    homogeneity = graycoprops(glcm, 'homogeneity').flatten()
-    energy = graycoprops(glcm, 'energy').flatten()
-    correlation = graycoprops(glcm, 'correlation').flatten()
-    asm = graycoprops(glcm, 'ASM').flatten()
+    contrast = graycoprops(glcm, 'contrast').flatten()  # 对比度
+    dissimilarity = graycoprops(glcm, 'dissimilarity').flatten()  # 不相似性
+    homogeneity = graycoprops(glcm, 'homogeneity').flatten()  # 同质性
+    energy = graycoprops(glcm, 'energy').flatten()  # 能量
+    correlation = graycoprops(glcm, 'correlation').flatten()  # 相关性
+    asm = graycoprops(glcm, 'ASM').flatten()  # 平均二次幂
 
     # 组合特征
     features = np.concatenate([contrast, dissimilarity, homogeneity, energy, correlation, asm])

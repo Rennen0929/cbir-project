@@ -37,12 +37,7 @@ public class CommonConstant {
     public static final String CALCULATE_SHAPE_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\calculate_image_shape.py";
 
     /**
-     * 匹配图片颜色信息，脚本位置
-     */
-    public static final String MATCH_COLOR_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\calculate_image_color.py";
-
-    /**
-     * 根据特征向量得出图片相似度，，脚本位置
+     * 根据特征向量得出图片相似度，脚本位置
      */
     public static final String MATCH_SCRIPT_PATH = "C:\\cbir-project\\python-scripts\\match_image_by_vector.py";
 

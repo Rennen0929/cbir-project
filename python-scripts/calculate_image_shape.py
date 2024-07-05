@@ -36,12 +36,12 @@ def compute_edge_direction_histogram(angles, bins=36):
 
 
 def extract_features(image):
-    image = load_image(image)
-    gray_image = rgb_to_gray(image)
-    blurred_image = gaussian_blur(gray_image)
-    grad_x, grad_y = sobel_gradient(blurred_image)
-    angles = compute_edge_angles(grad_x, grad_y)
-    hist = compute_edge_direction_histogram(angles)
+    image = load_image(image)  # 加载图像
+    gray_image = rgb_to_gray(image)  # 灰度化
+    blurred_image = gaussian_blur(gray_image)  # 高斯模糊
+    grad_x, grad_y = sobel_gradient(blurred_image)  # 计算 x 方向和 y 方向的梯度
+    angles = compute_edge_angles(grad_x, grad_y)  # 计算边缘角度
+    hist = compute_edge_direction_histogram(angles)  # 计算边缘方向直方图
     return hist
 
 
